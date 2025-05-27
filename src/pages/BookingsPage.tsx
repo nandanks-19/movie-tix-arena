@@ -1,3 +1,4 @@
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +25,7 @@ interface Booking {
     };
   };
   booking_seats: {
+    show_seat_id: string;
     seats: {
       row_number: number;
       seat_number: number;
@@ -59,6 +61,7 @@ const BookingsPage = () => {
             )
           ),
           booking_seats (
+            show_seat_id,
             seats:seat_id (
               row_number,
               seat_number
@@ -78,6 +81,53 @@ const BookingsPage = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    const confirmCancel = window.confirm("Are you sure you want to cancel this booking?");
+    if (!confirmCancel) return;
+
+    try {
+      // Step 1: Get show_seat_ids for this booking
+      const { data: seatMappings, error: seatError } = await supabase
+        .from('booking_seats')
+        .select('show_seat_id')
+        .eq('booking_id', bookingId);
+
+      if (seatError) throw seatError;
+
+      const showSeatIds = seatMappings.map((seat: any) => seat.show_seat_id);
+
+      // Step 2: Update booking status to 'cancelled'
+      const { error: cancelError } = await supabase
+        .from('bookings')
+        .update({ booking_status: 'cancelled' })
+        .eq('id', bookingId);
+
+      if (cancelError) throw cancelError;
+
+      // Step 3: Free the seats in show_seats
+      const { error: freeSeatsError } = await supabase
+        .from('show_seats')
+        .update({ is_booked: false, locked_until: null })
+        .in('id', showSeatIds);
+
+      if (freeSeatsError) throw freeSeatsError;
+
+      toast({
+        title: 'Booking Cancelled',
+        description: 'Your booking has been successfully cancelled.',
+      });
+
+      fetchBookings(); // refresh UI
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Error',
+        description: 'Could not cancel the booking.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -136,7 +186,7 @@ const BookingsPage = () => {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex-1">
                     <CardHeader>
                       <div className="flex justify-between items-start">
@@ -151,7 +201,7 @@ const BookingsPage = () => {
                         </Badge>
                       </div>
                     </CardHeader>
-                    
+
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div className="flex items-center space-x-2">
@@ -165,7 +215,7 @@ const BookingsPage = () => {
                             })}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <Clock className="h-4 w-4 text-gray-500" />
                           <span>
@@ -176,18 +226,18 @@ const BookingsPage = () => {
                             })}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <MapPin className="h-4 w-4 text-gray-500" />
                           <span>{booking.shows.screens.name}</span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                           <Users className="h-4 w-4 text-gray-500" />
                           <span>{booking.booking_seats.length} seat(s)</span>
                         </div>
                       </div>
-                      
+
                       <div className="border-t pt-4">
                         <div className="flex justify-between items-center">
                           <div>
@@ -203,6 +253,15 @@ const BookingsPage = () => {
                             </p>
                           </div>
                         </div>
+
+                        {booking.booking_status === 'confirmed' && (
+                          <button
+                            onClick={() => handleCancelBooking(booking.id)}
+                            className="mt-3 text-sm text-red-600 hover:underline"
+                          >
+                            Cancel Booking
+                          </button>
+                        )}
                       </div>
                     </CardContent>
                   </div>
