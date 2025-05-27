@@ -29,15 +29,15 @@ const Index = () => {
           <div className="space-x-4">
             {user ? (
               <>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="text-white hover:text-purple-200"
                   onClick={() => navigate('/movies')}
                 >
                   Movies
                 </Button>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="text-white hover:text-purple-200"
                   onClick={() => navigate('/bookings')}
                 >
@@ -45,8 +45,8 @@ const Index = () => {
                 </Button>
               </>
             ) : (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="border-white text-white hover:bg-white hover:text-purple-900"
                 onClick={() => navigate('/auth')}
               >
@@ -65,10 +65,10 @@ const Index = () => {
             <span className="text-purple-300 block">Movie Experience</span>
           </h1>
           <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-            Discover the latest movies, select your seats, and book tickets instantly. 
+            Discover the latest movies, select your seats, and book tickets instantly.
             Your cinema adventure starts here.
           </p>
-          <Button 
+          <Button
             size="lg"
             className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg"
             onClick={handleGetStarted}
@@ -93,7 +93,7 @@ const Index = () => {
               Simple and intuitive booking process. Select your movie, choose seats, and pay securely.
             </p>
           </div>
-          
+
           <div className="text-center">
             <div className="bg-purple-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Star className="h-8 w-8 text-purple-200" />
@@ -103,7 +103,7 @@ const Index = () => {
               Interactive seat map to help you choose the perfect seats for your movie experience.
             </p>
           </div>
-          
+
           <div className="text-center">
             <div className="bg-purple-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Clock className="h-8 w-8 text-purple-200" />
@@ -125,7 +125,7 @@ const Index = () => {
           <p className="text-xl text-purple-100 mb-8">
             Join thousands of movie lovers who trust CinemaBook for their entertainment needs.
           </p>
-          <Button 
+          <Button
             size="lg"
             className="bg-white text-purple-900 hover:bg-purple-100 px-8 py-3 text-lg"
             onClick={handleGetStarted}
